@@ -22,6 +22,27 @@
           >
         </div>
         <div class="flex items-center gap-1">
+          <!-- 가져오기 버튼 -->
+          <button
+            id="btn-import"
+            title="JSON 가져오기"
+            class="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+          >
+            <svg
+              class="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
+              />
+            </svg>
+          </button>
+          <input type="file" id="import-file" accept=".json" class="hidden" />
           <!-- 내보내기 버튼 -->
           <button
             id="btn-export"
