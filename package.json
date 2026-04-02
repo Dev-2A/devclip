@@ -1,0 +1,25 @@
+{
+  "name": "devclip",
+  "version": "1.0.0",
+  "description": "🌐 웹 페이지의 코드 블록을 원클릭 복사하고, 스니펫으로 로컬 저장태그·검색하는 개발자용 Chrome 익스텐션입니다.",
+  "main": "index.js",
+  "scripts": {
+    "build:css": "tailwindcss -i src/input.css -o popup/popup.css --minify",
+    "watch:css": "tailwindcss -i src/input.css -o popup/popup.css --watch",
+    "build": "npm run build:css"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Dev-2A/devclip.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Dev-2A/devclip/issues"
+  },
+  "homepage": "https://github.com/Dev-2A/devclip#readme",
+  "devDependencies": {
+    "tailwindcss": "^4.2.2"
+  }
+}
