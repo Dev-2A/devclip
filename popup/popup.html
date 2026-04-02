@@ -167,6 +167,120 @@
       </div>
     </div>
 
+    <!-- 단축키 안내 패널 -->
+    <div
+      id="shortcuts-panel"
+      class="absolute inset-0 bg-white z-50 flex flex-col hidden"
+    >
+      <div
+        class="flex items-center justify-between px-4 py-3 border-b border-gray-200"
+      >
+        <h2 class="text-sm font-bold text-gray-900">⌨️ 단축키 안내</h2>
+        <button
+          id="shortcuts-close"
+          class="p-1 rounded hover:bg-gray-100 text-gray-400 hover:text-gray-600"
+        >
+          <svg
+            class="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </button>
+      </div>
+      <div class="flex-1 overflow-y-auto px-4 py-3 space-y-3">
+        <div class="space-y-2">
+          <h3
+            class="text-xs font-semibold text-gray-500 uppercase tracking-wide"
+          >
+            팝업 내
+          </h3>
+          <div class="flex justify-between items-center py-1">
+            <span class="text-sm text-gray-700">검색 포커스</span>
+            <kbd
+              class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded border border-gray-200 font-mono"
+              >Ctrl+F</kbd
+            >
+          </div>
+          <div class="flex justify-between items-center py-1">
+            <span class="text-sm text-gray-700">검색 초기화</span>
+            <kbd
+              class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded border border-gray-200 font-mono"
+              >Esc</kbd
+            >
+          </div>
+        </div>
+        <div class="space-y-2">
+          <h3
+            class="text-xs font-semibold text-gray-500 uppercase tracking-wide"
+          >
+            웹 페이지
+          </h3>
+          <div class="flex justify-between items-center py-1">
+            <span class="text-sm text-gray-700">코드 블록 위 복사</span>
+            <span class="text-xs text-gray-500">📋 복사 버튼</span>
+          </div>
+          <div class="flex justify-between items-center py-1">
+            <span class="text-sm text-gray-700">코드 블록 저장</span>
+            <span class="text-xs text-gray-500">💾 저장 버튼</span>
+          </div>
+        </div>
+        <div class="space-y-2">
+          <h3
+            class="text-xs font-semibold text-gray-500 uppercase tracking-wide"
+          >
+            스니펫 관리
+          </h3>
+          <div class="flex justify-between items-center py-1">
+            <span class="text-sm text-gray-700">제목 편집</span>
+            <span class="text-xs text-gray-500">제목 클릭</span>
+          </div>
+          <div class="flex justify-between items-center py-1">
+            <span class="text-sm text-gray-700">코드 편집</span>
+            <span class="text-xs text-gray-500">코드 더블클릭</span>
+          </div>
+          <div class="flex justify-between items-center py-1">
+            <span class="text-sm text-gray-700">태그 추가</span>
+            <span class="text-xs text-gray-500">+ 버튼</span>
+          </div>
+          <div class="flex justify-between items-center py-1">
+            <span class="text-sm text-gray-700">태그 삭제</span>
+            <span class="text-xs text-gray-500">태그 호버 → ✗</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 하단 푸터 -->
+    <footer
+      class="flex items-center justify-between px-4 py-2 bg-white border-t border-gray-100 shrink-0"
+    >
+      <span class="text-xs text-gray-400">DevClip v0.1.0</span>
+      <div class="flex items-center gap-2">
+        <button
+          id="btn-export-md"
+          title="Markdown으로 내보내기"
+          class="text-xs text-gray-400 hover:text-gray-600 transition-colors"
+        >
+          MD
+        </button>
+        <button
+          id="btn-shortcuts"
+          title="단축키 안내"
+          class="text-xs text-gray-400 hover:text-gray-600 transition-colors"
+        >
+          ⌨️
+        </button>
+      </div>
+    </footer>
+
     <!-- storage.js를 popup에서도 사용 -->
     <script src="../utils/storage.js"></script>
     <script src="popup.js"></script>

@@ -17,8 +17,13 @@
   const searchClear = document.getElementById("search-clear");
   const searchStatus = document.getElementById("search-status");
   const searchStatusText = document.getElementById("search-status-text");
+  const btnExportMd = document.getElementById("btn-export-md");
+  const btnShortcuts = document.getElementById("btn-shortcuts");
+  const shortcutsPanel = document.getElementById("shortcuts-panel");
+  const shortcutsClose = document.getElementById("shortcuts-close");
 
   let debounceTimer = null;
+  let clickTimer = null;
   let currentFilter = "";
   let activeTag = null;
   let expandedId = null; // 현재 펼쳐진 스니펫 ID
@@ -210,8 +215,65 @@
 
     // 코드 영역 클릭 → 펼치기/접기
     card.querySelector(".code-area").addEventListener("click", () => {
-      expandedId = expandedId === snippet.id ? null : snippet.id;
-      render();
+      if (clickTimer) return;
+      clickTimer = setTimeout(() => {
+        clickTimer = null;
+        expandedId = expandedId === snippet.id ? null : snippet.id;
+        render();
+      }, 250);
+    });
+
+    // 코드 영역 더블클릭 → 코드 편집
+    card.querySelector(".code-area pre").addEventListener("dblclick", (e) => {
+      e.stopPropagation();
+      if (clickTimer) {
+        clearTimeout(clickTimer);
+        clickTimer = null;
+      }
+
+      const preEl = card.querySelector(".code-area pre");
+
+      const textarea = document.createElement("textarea");
+      textarea.value = snippet.code;
+      textarea.className =
+        "w-full text-xs font-mono bg-gray-900 text-gray-100 rounded-lg p-2.5 leading-relaxed resize-y " +
+        "border-2 border-blue-500 focus:outline-none min-h-[80px] max-h-64";
+      textarea.rows = Math.min(snippet.code.split("\n").length + 1, 15);
+
+      preEl.replaceWith(textarea);
+      textarea.focus();
+
+      const hint = document.createElement("p");
+      hint.className = "text-xs text-blue-500 mt-1 font-medium";
+      hint.textContent = "Ctrl+Enter로 저장 · Escape로 취소";
+      textarea.parentNode.insertBefore(hint, textarea.nextSibling);
+
+      const saveCode = async () => {
+        const newCode = textarea.value;
+        if (newCode.trim() !== snippet.code.trim()) {
+          await DevClipStorage.update(snippet.id, { code: newCode });
+        }
+        hint.remove();
+        render();
+      };
+
+      const cancelEdit = () => {
+        hint.remove();
+        render();
+      };
+
+      textarea.addEventListener("keydown", (ev) => {
+        if (ev.ctrlKey && ev.key === "Enter") {
+          ev.preventDefault();
+          saveCode();
+        }
+        if (ev.key === "Escape") {
+          ev.preventDefault();
+          cancelEdit();
+        }
+      });
+
+      textarea.addEventListener("blur", saveCode);
     });
 
     // 복사 버튼
@@ -230,12 +292,30 @@
       }, 1500);
     });
 
-    // 삭제 버튼
+    // 삭제 버튼 (확인 후 삭제)
     card.querySelector(".delete-btn").addEventListener("click", async (e) => {
       e.stopPropagation();
-      await DevClipStorage.remove(snippet.id);
-      if (expandedId === snippet.id) expandedId = null;
-      render();
+      const btn = card.querySelector(".delete-btn");
+
+      if (btn.dataset.confirm === "true") {
+        await DevClipStorage.remove(snippet.id);
+        if (expandedId === snippet.id) expandedId = null;
+        render();
+        return;
+      }
+
+      btn.dataset.confirm = "true";
+      btn.innerHTML = `<span class="text-xs font-medium text-red-500">삭제?</span>`;
+      btn.classList.add("bg-red-50");
+
+      setTimeout(() => {
+        btn.dataset.confirm = "false";
+        btn.classList.remove("bg-red-50");
+        btn.innerHTML = `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M6 18L18 6M6 6l12 12"/>
+        </svg>`;
+      }, 3000);
     });
 
     // 제목 클릭 → 인라인 편집
@@ -512,6 +592,27 @@
       expandedId = null;
       render();
     }
+  });
+
+  // Markdown 내보내기
+  btnExportMd.addEventListener("click", async () => {
+    const md = await DevClipStorage.exportMarkdown();
+    const blob = new Blob([md], { type: "text/markdown" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `devclip-snippets-${new Date().toISOString().slice(0, 10)}.md`;
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  // 단축키 안내 패널
+  btnShortcuts.addEventListener("click", () => {
+    shortcutsPanel.classList.remove("hidden");
+  });
+
+  shortcutsClose.addEventListener("click", () => {
+    shortcutsPanel.classList.add("hidden");
   });
 
   // 초기 렌더링

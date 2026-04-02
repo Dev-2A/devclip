@@ -74,6 +74,34 @@ const DevClipStorage = {
     return JSON.stringify(snippets, null, 2);
   },
 
+  // Markdown 내보내기
+  async exportMarkdown() {
+    const snippets = await this.getAll();
+    if (snippets.length === 0)
+      return "# DevClip Snippets\n\n_저장된 스니펫이 없습니다._";
+
+    let md = "# DevClip Snippets\n\n";
+    md += `> ${snippets.length}개 스니펫 · 내보내기 ${new Date().toLocaleDateString("ko-KR")}\n\n`;
+    md += "---\n\n";
+
+    snippets.forEach((s, i) => {
+      md += `## ${i + 1}. ${s.title}\n\n`;
+      md += `- **언어**: \`${s.language}\`\n`;
+      if (s.tags && s.tags.length > 0) {
+        md += `- **태그**: ${s.tags.map((t) => `\`${t}\``).join(", ")}\n`;
+      }
+      if (s.url) {
+        md += `- **출처**: [${new URL(s.url).hostname}](${s.url})\n`;
+      }
+      md += `- **저장일**: ${new Date(s.createdAt).toLocaleDateString("ko-KR")}\n\n`;
+      md += "```" + s.language + "\n";
+      md += s.code + "\n";
+      md += "```\n\n---\n\n";
+    });
+
+    return md;
+  },
+
   // JSON 가져오기
   async importJSON(jsonString) {
     const imported = JSON.parse(jsonString);
