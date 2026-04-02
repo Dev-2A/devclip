@@ -19,6 +19,43 @@
   let activeTag = null;
   let expandedId = null; // 현재 펼쳐진 스니펫 ID
 
+  // 태그 색상 팔레트 (Tailwind 색상 기반)
+  const TAG_COLORS = [
+    { bg: "bg-blue-50", text: "text-blue-600", hoverBg: "hover:bg-blue-100" },
+    {
+      bg: "bg-purple-50",
+      text: "text-purple-600",
+      hoverBg: "hover:bg-purple-100",
+    },
+    {
+      bg: "bg-green-50",
+      text: "text-green-600",
+      hoverBg: "hover:bg-green-100",
+    },
+    {
+      bg: "bg-amber-50",
+      text: "text-amber-600",
+      hoverBg: "hover:bg-amber-100",
+    },
+    { bg: "bg-pink-50", text: "text-pink-600", hoverBg: "hover:bg-pink-100" },
+    { bg: "bg-cyan-50", text: "text-cyan-600", hoverBg: "hover:bg-cyan-100" },
+    { bg: "bg-rose-50", text: "text-rose-600", hoverBg: "hover:bg-rose-100" },
+    {
+      bg: "bg-indigo-50",
+      text: "text-indigo-600",
+      hoverBg: "hover:bg-indigo-100",
+    },
+  ];
+
+  // 태그 이름 → 고정 색상 매핑 (해시 기반)
+  function getTagColor(tag) {
+    let hash = 0;
+    for (let i = 0; i < tag.length; i++) {
+      hash = tag.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return TAG_COLORS[Math.abs(hash) % TAG_COLORS.length];
+  }
+
   /**
    * 스니펫 목록 렌더링
    */
@@ -127,10 +164,13 @@
             ${
               snippet.tags && snippet.tags.length > 0
                 ? snippet.tags
-                    .map(
-                      (t) =>
-                        `<span class="tag-chip text-xs bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded cursor-pointer hover:bg-blue-100 transition-colors">${escapeHtml(t)}</span>`,
-                    )
+                    .map((t) => {
+                      const c = getTagColor(t);
+                      return `<span class="tag-chip group inline-flex items-center gap-0.5 text-xs ${c.bg} ${c.text} px-1.5 py-0.5 rounded cursor-pointer ${c.hoverBg} transition-colors" data-tag="${escapeHtml(t)}">
+                        ${escapeHtml(t)}
+                        <button class="remove-tag-btn hidden group-hover:inline-flex items-center justify-center w-3 h-3 rounded-full hover:bg-black/10 text-current leading-none" title="태그 삭제">&times;</button>
+                      </span>`;
+                    })
                     .join("")
                 : ""
             }
@@ -253,19 +293,31 @@
     card.querySelectorAll(".tag-chip").forEach((chip) => {
       chip.addEventListener("click", (e) => {
         e.stopPropagation();
-        activeTag = chip.textContent;
+        activeTag = chip.dataset.tag;
         render();
       });
+
+      // 태그 삭제 버튼 (X)
+      const removeBtn = chip.querySelector(".remove-tag-btn");
+      if (removeBtn) {
+        removeBtn.addEventListener("click", async (e) => {
+          e.stopPropagation();
+          const tag = chip.dataset.tag;
+          await DevClipStorage.removeTag(snippet.id, tag);
+          render();
+        });
+      }
     });
 
     return card;
   }
 
   /**
-   * 태그 필터 영역 렌더링
+   * 태그 필터 영역 렌더링 (카운트 포함)
    */
   async function renderTags() {
     const tags = await DevClipStorage.getAllTags();
+    const counts = await DevClipStorage.getTagCounts();
 
     if (tags.length === 0) {
       tagFilterArea.classList.add("hidden");
@@ -275,27 +327,34 @@
     tagFilterArea.classList.remove("hidden");
     tagList.innerHTML = "";
 
+    // "전체" 버튼
+    const total = (await DevClipStorage.getAll()).length;
     const allBtn = document.createElement("button");
     allBtn.className = `text-xs px-2 py-1 rounded-full font-medium transition-colors ${
       activeTag === null
         ? "bg-blue-500 text-white"
         : "bg-gray-100 text-gray-600 hover:bg-gray-200"
     }`;
-    allBtn.textContent = "전체";
+    allBtn.textContent = `전체 ${total}`;
     allBtn.addEventListener("click", () => {
       activeTag = null;
       render();
     });
     tagList.appendChild(allBtn);
 
+    // 각 태그 버튼 (카운트 포함)
     tags.forEach((tag) => {
+      const c = getTagColor(tag);
       const btn = document.createElement("button");
-      btn.className = `text-xs px-2 py-1 rounded-full font-medium transition-colors ${
-        activeTag === tag
-          ? "bg-blue-500 text-white"
-          : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-      }`;
-      btn.textContent = tag;
+
+      if (activeTag === tag) {
+        btn.className =
+          "text-xs px-2 py-1 rounded-full font-medium transition-colors bg-blue-500 text-white";
+      } else {
+        btn.className = `text-xs px-2 py-1 rounded-full font-medium transition-colors ${c.bg} ${c.text} ${c.hoverBg}`;
+      }
+
+      btn.textContent = `${tag} ${counts[tag] || 0}`;
       btn.addEventListener("click", () => {
         activeTag = tag;
         render();

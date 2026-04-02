@@ -85,6 +85,30 @@ const DevClipStorage = {
     return merged.length;
   },
 
+  // 태그별 스니펫 개수 가져오기
+  async getTagCounts() {
+    const snippets = await this.getAll();
+    const counts = {};
+    snippets.forEach((s) => {
+      if (s.tags && Array.isArray(s.tags)) {
+        s.tags.forEach((t) => {
+          counts[t] = (counts[t] || 0) + 1;
+        });
+      }
+    });
+    return counts;
+  },
+
+  // 특정 스니펫에서 태그 제거
+  async removeTag(id, tag) {
+    const snippets = await this.getAll();
+    const index = snippets.findIndex((s) => s.id === id);
+    if (index !== -1 && snippets[index].tags) {
+      snippets[index].tags = snippets[index].tags.filter((t) => t !== tag);
+      await chrome.storage.local.set({ snippets });
+    }
+  },
+
   // 툴바 아이콘에 뱃지 카운트 표시
   updateBadge(count) {
     try {
