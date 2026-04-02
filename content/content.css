@@ -70,3 +70,20 @@
 .devclip-bar * {
   box-sizing: border-box;
 }
+
+/* 다크 배경 위 버튼 가독성 보장 */
+.devclip-btn-copy {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.devclip-btn-save {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* 토스트가 다크모드 사이트에서도 잘 보이게 */
+.devclip-toast {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}

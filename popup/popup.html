@@ -1,27 +1,64 @@
 <!doctype html>
-<html lang="ko">
+<html lang="ko" class="light">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=400" />
     <title>DevClip</title>
     <link rel="stylesheet" href="popup.css" />
   </head>
-  <body class="w-[400px] h-[500px] bg-gray-50 text-gray-900 overflow-hidden">
+  <body
+    class="w-[400px] h-[500px] bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-100 overflow-hidden"
+  >
     <div id="app" class="flex flex-col h-full">
       <!-- 헤더 -->
       <header
-        class="flex items-center justify-between px-4 py-3 bg-white border-b border-gray-200 shrink-0"
+        class="flex items-center justify-between px-4 py-3 bg-white border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700 shrink-0"
       >
         <div class="flex items-center gap-2">
           <span class="text-lg">🌐</span>
           <h1 class="text-base font-bold text-gray-900">DevClip</h1>
           <span
             id="snippet-count"
-            class="text-xs bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded-full font-medium"
+            class="text-xs bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 px-1.5 py-0.5 rounded-full font-medium"
             >0</span
           >
         </div>
         <div class="flex items-center gap-1">
+          <!-- 다크모드 토글 -->
+          <button
+            id="btn-theme"
+            title="다크/라이트 모드 전환"
+            class="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:text-gray-300 dark:hover:bg-gray-700 transition-colors"
+          >
+            <svg
+              id="icon-sun"
+              class="w-4 h-4 hidden"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
+              />
+            </svg>
+            <svg
+              id="icon-moon"
+              class="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
+              />
+            </svg>
+          </button>
           <!-- 가져오기 버튼 -->
           <button
             id="btn-import"
@@ -87,7 +124,9 @@
       </header>
 
       <!-- 검색바 -->
-      <div class="px-4 py-2 bg-white border-b border-gray-100 shrink-0">
+      <div
+        class="px-4 py-2 bg-white border-b border-gray-100 dark:bg-gray-800 dark:border-gray-700 shrink-0"
+      >
         <div class="relative">
           <svg
             class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"
@@ -106,7 +145,7 @@
             id="search-input"
             type="text"
             placeholder="코드, 태그, 언어로 검색... (Ctrl+F)"
-            class="w-full pl-9 pr-8 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-400"
+            class="w-full pl-9 pr-8 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-400 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 dark:placeholder-gray-500"
           />
           <!-- 검색어 초기화 버튼 -->
           <button
@@ -126,7 +165,7 @@
       <!-- 태그 필터 영역 -->
       <div
         id="tag-filter-area"
-        class="px-4 py-2 bg-white border-b border-gray-100 shrink-0 hidden"
+        class="px-4 py-2 bg-white border-b border-gray-100 dark:bg-gray-800 dark:border-gray-700 shrink-0 hidden"
       >
         <div id="tag-list" class="flex flex-wrap gap-1.5">
           <!-- JS로 태그 버튼 동적 생성 -->
@@ -144,10 +183,10 @@
         class="flex-1 flex flex-col items-center justify-center text-center px-8 hidden"
       >
         <div class="text-4xl mb-3">📋</div>
-        <p class="text-sm font-medium text-gray-500 mb-1">
+        <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
           저장된 스니펫이 없습니다
         </p>
-        <p class="text-xs text-gray-400 leading-relaxed">
+        <p class="text-xs text-gray-400 dark:text-gray-500 leading-relaxed">
           웹 페이지의 코드 블록 위에 마우스를 올리고<br />
           <span
             class="inline-flex items-center gap-1 bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded text-xs font-medium"
@@ -170,10 +209,10 @@
     <!-- 단축키 안내 패널 -->
     <div
       id="shortcuts-panel"
-      class="absolute inset-0 bg-white z-50 flex flex-col hidden"
+      class="absolute inset-0 bg-white dark:bg-gray-900 z-50 flex flex-col hidden"
     >
       <div
-        class="flex items-center justify-between px-4 py-3 border-b border-gray-200"
+        class="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700"
       >
         <h2 class="text-sm font-bold text-gray-900">⌨️ 단축키 안내</h2>
         <button
@@ -260,7 +299,7 @@
 
     <!-- 하단 푸터 -->
     <footer
-      class="flex items-center justify-between px-4 py-2 bg-white border-t border-gray-100 shrink-0"
+      class="flex items-center justify-between px-4 py-2 bg-white border-t border-gray-100 dark:bg-gray-800 dark:border-gray-700 shrink-0"
     >
       <span class="text-xs text-gray-400">DevClip v0.1.0</span>
       <div class="flex items-center gap-2">

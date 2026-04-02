@@ -21,6 +21,9 @@
   const btnShortcuts = document.getElementById("btn-shortcuts");
   const shortcutsPanel = document.getElementById("shortcuts-panel");
   const shortcutsClose = document.getElementById("shortcuts-close");
+  const btnTheme = document.getElementById("btn-theme");
+  const iconSun = document.getElementById("icon-sun");
+  const iconMoon = document.getElementById("icon-moon");
 
   let debounceTimer = null;
   let clickTimer = null;
@@ -126,7 +129,7 @@
   function createSnippetCard(snippet) {
     const card = document.createElement("div");
     card.className =
-      "border-b border-gray-100 hover:bg-white transition-colors";
+      "border-b border-gray-100 hover:bg-white dark:border-gray-700 dark:hover:bg-gray-800 transition-colors";
 
     const isExpanded = expandedId === snippet.id;
     const lines = snippet.code.split("\n");
@@ -140,7 +143,7 @@
         <!-- 상단: 제목 편집 + 액션 버튼 -->
         <div class="flex items-start justify-between gap-2 mb-1.5">
           <div class="flex items-center gap-1.5 min-w-0 flex-1">
-            <span class="text-xs font-mono font-medium px-1.5 py-0.5 rounded bg-gray-100 text-gray-600 shrink-0">${highlightText(snippet.language, currentFilter)}</span>
+            <span class="text-xs font-mono font-medium px-1.5 py-0.5 rounded bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300 shrink-0">${highlightText(snippet.language, currentFilter)}</span>
             <span class="snippet-title text-xs text-gray-700 truncate cursor-pointer hover:text-blue-600"
               title="클릭하여 제목 편집">${highlightText(snippet.title, currentFilter)}</span>
           </div>
@@ -613,6 +616,35 @@
 
   shortcutsClose.addEventListener("click", () => {
     shortcutsPanel.classList.add("hidden");
+  });
+
+  // 다크모드 토글
+  function applyTheme(dark) {
+    const html = document.documentElement;
+    if (dark) {
+      html.classList.add("dark");
+      html.classList.remove("light");
+      iconSun.classList.remove("hidden");
+      iconMoon.classList.add("hidden");
+    } else {
+      html.classList.remove("dark");
+      html.classList.add("light");
+      iconSun.classList.add("hidden");
+      iconMoon.classList.remove("hidden");
+    }
+  }
+
+  // 저장된 테마 불러오기
+  chrome.storage.local.get("theme", (result) => {
+    const isDark = result.theme === "dark";
+    applyTheme(isDark);
+  });
+
+  btnTheme.addEventListener("click", () => {
+    const isDark = document.documentElement.classList.contains("dark");
+    const newTheme = isDark ? "light" : "dark";
+    chrome.storage.local.set({ theme: newTheme });
+    applyTheme(!isDark);
   });
 
   // 초기 렌더링
