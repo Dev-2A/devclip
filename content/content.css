@@ -1,0 +1,72 @@
+/* DevClip - 코드 블록 위에 표시되는 버튼 바 */
+.devclip-bar {
+  display: flex;
+  gap: 4px;
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  z-index: 9999;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+/* 코드 블록에 호버하면 버튼 표시 */
+.devclip-wrapper:hover .devclip-bar {
+  opacity: 1;
+}
+
+.devclip-wrapper {
+  position: relative;
+}
+
+/* 버튼 공통 스타일 */
+.devclip-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+/* 복사 버튼 */
+.devclip-btn-copy {
+  background: rgba(255, 255, 255, 0.9);
+  color: #374151;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+.devclip-btn-copy:hover {
+  background: #ffffff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* 저장 버튼 */
+.devclip-btn-save {
+  background: rgba(59, 130, 246, 0.9);
+  color: #ffffff;
+  box-shadow: 0 1px 3px rgba(59, 130, 246, 0.3);
+}
+
+.devclip-btn-save:hover {
+  background: rgba(37, 99, 235, 1);
+  box-shadow: 0 2px 6px rgba(59, 130, 246, 0.4);
+}
+
+/* 성공 상태 */
+.devclip-btn-success {
+  background: rgba(16, 185, 129, 0.9) !important;
+  color: #ffffff !important;
+}
+
+/* 이미 사이트에서 자체 복사 버튼이 있는 경우와의 충돌 방지 */
+.devclip-bar * {
+  box-sizing: border-box;
+}
