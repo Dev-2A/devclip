@@ -14,7 +14,11 @@
   const btnImport = document.getElementById("btn-import");
   const importFile = document.getElementById("import-file");
   const btnClear = document.getElementById("btn-clear");
+  const searchClear = document.getElementById("search-clear");
+  const searchStatus = document.getElementById("search-status");
+  const searchStatusText = document.getElementById("search-status-text");
 
+  let debounceTimer = null;
   let currentFilter = "";
   let activeTag = null;
   let expandedId = null; // 현재 펼쳐진 스니펫 ID
@@ -91,6 +95,16 @@
     }
 
     snippetList.classList.remove("hidden");
+
+    // 검색 상태 표시
+    if (currentFilter) {
+      const totalAll = (await DevClipStorage.getAll()).length;
+      searchStatus.classList.remove("hidden");
+      searchStatusText.textContent = `${totalAll}개 중 ${snippets.length}개 일치`;
+    } else {
+      searchStatus.classList.add("hidden");
+    }
+
     snippetList.innerHTML = "";
 
     snippets.forEach((snippet) => {
@@ -121,9 +135,9 @@
         <!-- 상단: 제목 편집 + 액션 버튼 -->
         <div class="flex items-start justify-between gap-2 mb-1.5">
           <div class="flex items-center gap-1.5 min-w-0 flex-1">
-            <span class="text-xs font-mono font-medium px-1.5 py-0.5 rounded bg-gray-100 text-gray-600 shrink-0">${escapeHtml(snippet.language)}</span>
+            <span class="text-xs font-mono font-medium px-1.5 py-0.5 rounded bg-gray-100 text-gray-600 shrink-0">${highlightText(snippet.language, currentFilter)}</span>
             <span class="snippet-title text-xs text-gray-700 truncate cursor-pointer hover:text-blue-600"
-              title="클릭하여 제목 편집">${escapeHtml(snippet.title)}</span>
+              title="클릭하여 제목 편집">${highlightText(snippet.title, currentFilter)}</span>
           </div>
           <div class="flex items-center gap-1 shrink-0">
             <button class="copy-btn p-1 rounded hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors" title="복사">
@@ -145,7 +159,7 @@
         <div class="code-area cursor-pointer" title="클릭하여 ${isExpanded ? "접기" : "펼치기"}">
           <pre class="text-xs font-mono bg-gray-900 text-gray-100 rounded-lg p-2.5 overflow-x-auto mb-2 leading-relaxed ${
             isExpanded ? "max-h-64 overflow-y-auto" : "max-h-20 overflow-hidden"
-          }">${escapeHtml(displayCode)}</pre>
+          }">${highlightText(displayCode, currentFilter)}</pre>
           ${
             hasMore && !isExpanded
               ? `<p class="text-xs text-blue-500 -mt-1 mb-1.5 font-medium">▼ ${lines.length}줄 전체 보기</p>`
@@ -379,6 +393,24 @@
   }
 
   /**
+   * 검색어 하이라이팅 (HTML 이스케이프 후 적용)
+   */
+  function highlightText(text, query) {
+    if (!query || query.trim() === "") return escapeHtml(text);
+
+    const escaped = escapeHtml(text);
+    const q = escapeHtml(query.trim());
+    const regex = new RegExp(
+      `(${q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`,
+      "gi",
+    );
+    return escaped.replace(
+      regex,
+      `<mark class="bg-yellow-200 text-yellow-900 rounded px-0.5">$1</mark>`,
+    );
+  }
+
+  /**
    * HTML 이스케이프
    */
   function escapeHtml(str) {
@@ -389,11 +421,51 @@
 
   // --- 이벤트 바인딩 ---
 
-  // 검색
+  // 검색 (디바운스 적용)
   searchInput.addEventListener("input", (e) => {
-    currentFilter = e.target.value;
+    const value = e.target.value;
+
+    // 검색어 초기화 버튼 표시/숨김
+    searchClear.classList.toggle("hidden", value.length === 0);
+
+    // 디바운스: 150ms 후 검색 실행
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => {
+      currentFilter = value;
+      render();
+    }, 150);
+  });
+
+  // 검색어 초기화 버튼
+  searchClear.addEventListener("click", () => {
+    searchInput.value = "";
+    currentFilter = "";
+    searchClear.classList.add("hidden");
+    searchStatus.classList.add("hidden");
+    searchInput.focus();
     render();
   });
+
+  // 키보드 단축키: Ctrl+F → 검색 포커스
+  document.addEventListener("keydown", (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === "f") {
+      e.preventDefault();
+      searchInput.focus();
+      searchInput.select();
+    }
+    // Escape → 검색 초기화
+    if (e.key === "Escape" && document.activeElement === searchInput) {
+      searchInput.value = "";
+      currentFilter = "";
+      searchClear.classList.add("hidden");
+      searchStatus.classList.add("hidden");
+      searchInput.blur();
+      render();
+    }
+  });
+
+  // 팝업 열릴 때 자동 포커스
+  searchInput.focus();
 
   // JSON 내보내기
   btnExport.addEventListener("click", async () => {
